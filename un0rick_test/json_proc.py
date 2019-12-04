@@ -377,7 +377,6 @@ class us_json:
             plt.title(self.create_title_text())
             plt.tight_layout()
 
-
             file_name = os.path.join(os.path.dirname(self.path), "images", "Spectrum_", self.iD + "-" + str(self.N) + ".jpg")
             # file_name = "images/Spectrum_" + self.iD + "-" + str(self.N) + ".jpg"
             plt.savefig(file_name)
