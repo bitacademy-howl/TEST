@@ -152,7 +152,7 @@ class DDD_File:
                 self.header = DDD_Header(WIDTH=w, HEGHIT=h, DEPTH=d, LEVEL=l, SAMPLING_RATE=sr, US_VALOCITY=v)
                 self.data = bytearray(f.read())
 
-            print(w, h, d, l, sr, v)
+            # print(w, h, d, l, sr, v)
             # print(data)
 
     def _getctime(self):
