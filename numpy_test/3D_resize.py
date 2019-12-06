@@ -9,11 +9,8 @@ from scipy.ndimage import zoom
 
 
 
-
-
 # s1 = datetime.now()
 data = np.random.randint(0, 256, size = (50, 50, 521)).astype(np.uint8)
-
 
 def float_process(arr : np.ndarray) -> np.ndarray:
     return arr / 255

@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import hilbert, chirp, hilbert2
 
 from DAO.DDD import DDD_File
+from scipy_test.module import FilteredSignal
 
 
 def envelope(data, bias = 0, axis=-1):
@@ -74,6 +75,7 @@ def example():
 
     signal1 = chirp(t, 20.0, t[-1], 100.0) # fundamental freq = 20
     signal2 = signal1 * (1.0 + 0.5 * np.sin(2.0*np.pi*3.0*t) )
+
     analytic_signal = hilbert(signal2, N=None)
     amplitude_envelope = np.abs(analytic_signal)
     # amplitude_envelope_not_abs = analytic_signal
@@ -96,8 +98,13 @@ def example():
 
     signal5 = get_data()
     t5 = np.arange(len(signal5)) - 0.5
+
+    filteredSignal = FilteredSignal(signal5, fs, cutoff=30)
+
     analytic_signal5 = hilbert(signal5, N=None)
     amplitude_envelope5 = np.abs(analytic_signal5)
+
+
 
     # instantaneous_phase = np.unwrap(np.angle(analytic_signal))
     # instantaneous_frequency = (np.diff(instantaneous_phase) / (2.0*np.pi) * fs)
@@ -132,9 +139,6 @@ def example():
     ax5.plot(t4, amplitude_envelope4, label='envelope')
     ax5.set_xlabel("time in seconds")
     ax5.legend()
-
-    print(amplitude_envelope4[199])
-
 
     ax6 = fig.add_subplot(616)
     ax6.plot(t5, signal5, label='signal')
