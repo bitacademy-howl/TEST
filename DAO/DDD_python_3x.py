@@ -16,12 +16,12 @@ class DDD_Header:
         self.SetSamplingRate(SAMPLING_RATE) # MHz [ UNIT : sample / s ]
         self.SetVelocityDouble(US_VALOCITY) # [ UNIT : us / 2T ( T = mm ) ]
 
-        self._SetCaluclationFactor()
+        self.__SetCaluclationFactor()
 
-    def _SetCaluclationFactor(self):
+    def __SetCaluclationFactor(self):
         # Calculated Factors ###########################################################################################
-        self._SetTRange()
-        self._SetTLabel()
+        self.__SetTRange()
+        self.__SetTLabel()
         ################################################################################################################
     def GetCaluclationFactor(self):
         return [self.GetTRange(), self.GetTLabel()]
@@ -56,12 +56,12 @@ class DDD_Header:
     def GetVelocityDouble(self):
         return self.__US_VELOCITY_DOUBLE
 
-    def _SetTRange(self):
+    def __SetTRange(self):
         self.__T_RANGE = np.arange(0, self.__DEPTH + 1, self.__DEPTH / 10)
     def GetTRange(self):
         return self.__T_RANGE
 
-    def _SetTLabel(self):
+    def __SetTLabel(self):
         self.__T_Label = np.round(self.__T_RANGE / (self.__SAMPLING_RATE * self.__US_VELOCITY_DOUBLE), 1)
     def GetTLabel(self):
         return self.__T_Label
