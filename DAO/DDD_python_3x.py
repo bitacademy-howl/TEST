@@ -1,9 +1,7 @@
 import os
 import struct
-from builtins import Exception
 from datetime import datetime
 import numpy as np
-
 
 class DDD_Header:
 
@@ -91,56 +89,58 @@ class DDD_File:
     def __init__(self, path = None, header=None, data = None):
         # initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         if path is not None and isinstance(path, str):
-            self.path = path
+            self.__path = path
         else:
-            self.path = self._getctime() + ".ddd"
+            self.__path = self.__getctime() + ".ddd"
 
         self.SetHeader(header)
-        self.data = data
+        self.SetData(data)
 
     def SetHeader(self, header : DDD_Header = None):
         if isinstance(header, DDD_Header):
-            self.header = header
+            self.__header = header
         elif header == None:
             pass
         else:
             raise TypeError("Type Must Be Class of DDD_HEADER")
     def GetHeader(self) -> DDD_Header :
-        return self.header
+        return self.__header
+    def IsHeader(self):
+        return True if self.GetHeader() != None else False
 
     def SetData(self, data : list):
-        self.data = data
+        self.__data = data
     def GetData(self) -> list:
-        return self.data
+        return self.__data
 
     def Save(self, path = None):
         if path == None:
-            path = self.path
+            path = self.__path
 
-        _, extention = os.path.splitext(self.path)
+        _, extention = os.path.splitext(path)
         if extention != ".ddd":
             raise Exception
 
         if self.GetHeader() == None:
             raise NoneHeaderException
 
-        pixel_size = round(self.header.GetLevel() / 256)
-        if len(self.data) == (self.header.GetWidth() * self.header.GetHeight() * self.header.GetDepth() * pixel_size):
-            with open(self.path, "wb") as f:
-                f.write(struct.pack('5i', self.header.GetWidth(), self.header.GetHeight(), self.header.GetDepth(), self.header.GetLevel(), self.header.GetSamplingRate()))
-                f.write(struct.pack('d', self.header.GetVelocityDouble()))
-                f.write(bytearray(self.data))
+        pixel_size = round(self.__header.GetLevel() / 256)
+        if len(self.__data) == (self.__header.GetWidth() * self.__header.GetHeight() * self.__header.GetDepth() * pixel_size):
+            with open(self.__path, "wb") as f:
+                f.write(struct.pack('5i', self.__header.GetWidth(), self.__header.GetHeight(), self.__header.GetDepth(), self.__header.GetLevel(), self.__header.GetSamplingRate()))
+                f.write(struct.pack('d', self.__header.GetVelocityDouble()))
+                f.write(bytearray(self.__data))
 
     def Load(self, path = None):
         if path == None:
-            path = self.path
+            path = self.__path
         if path is not None and isinstance(path, str):
-            self.path = path
-            _, extention = os.path.splitext(self.path)
+            self.__path = path
+            _, extention = os.path.splitext(self.__path)
 
         if extention == ".ddd":
 
-            with open(self.path, "rb") as f:
+            with open(self.__path, "rb") as f:
                 headlist = [f.read(struct.calcsize('i')), f.read(struct.calcsize('i')), f.read(struct.calcsize('i')), f.read(struct.calcsize('i')), f.read(struct.calcsize('i')), f.read(struct.calcsize('d'))]
                 w = struct.unpack("i", headlist[0])[0]
                 h = struct.unpack("i", headlist[1])[0]
@@ -149,13 +149,10 @@ class DDD_File:
                 sr = struct.unpack("i", headlist[4])[0]
                 v = struct.unpack("d", headlist[5])[0]
 
-                self.header = DDD_Header(WIDTH=w, HEGHIT=h, DEPTH=d, LEVEL=l, SAMPLING_RATE=sr, US_VALOCITY=v)
-                self.data = bytearray(f.read())
+                self.SetHeader(DDD_Header(WIDTH=w, HEGHIT=h, DEPTH=d, LEVEL=l, SAMPLING_RATE=sr, US_VALOCITY=v))
+                self.SetData(bytearray(f.read()))
 
-            # print(w, h, d, l, sr, v)
-            # print(data)
-
-    def _getctime(self):
+    def __getctime(self):
         date = datetime.now()
         ret = date.strftime("%Y%m%d-%H%M%S")   # return : str
         return ret

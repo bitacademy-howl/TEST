@@ -4,10 +4,8 @@ import struct
 from datetime import datetime
 import numpy as np
 
-
 class DDD_Header:
 
-    # 헤더 사이즈 : 5-integer, 1-float
     def __init__(self, WIDTH = None, HEGHIT = None, DEPTH = None, LEVEL=None, SAMPLING_RATE=None, US_VALOCITY=None):
         self.SetAll(WIDTH=WIDTH, HEGHIT=HEGHIT, DEPTH=DEPTH, LEVEL=LEVEL, SAMPLING_RATE=SAMPLING_RATE, US_VALOCITY=US_VALOCITY)
 
@@ -16,17 +14,15 @@ class DDD_Header:
         self.SetHeight(HEGHIT)
         self.SetDepth(DEPTH)
         self.SetLevel(LEVEL)
-        # 초당 sample 수
         self.SetSamplingRate(SAMPLING_RATE) # MHz [ UNIT : sample / s ]
-        # 초음파의 2T 돌파 속도
         self.SetVelocityDouble(US_VALOCITY) # [ UNIT : us / 2T ( T = mm ) ]
 
-        self._SetCaluclationFactor()
+        self.__SetCaluclationFactor()
 
-    def _SetCaluclationFactor(self):
+    def __SetCaluclationFactor(self):
         # Calculated Factors ###########################################################################################
-        self._SetTRange()
-        self._SetTLabel()
+        self.__SetTRange()
+        self.__SetTLabel()
         ################################################################################################################
     def GetCaluclationFactor(self):
         return [self.GetTRange(), self.GetTLabel()]
@@ -61,12 +57,12 @@ class DDD_Header:
     def GetVelocityDouble(self):
         return self.__US_VELOCITY_DOUBLE
 
-    def _SetTRange(self):
+    def __SetTRange(self):
         self.__T_RANGE = np.arange(0, self.__DEPTH + 1, self.__DEPTH / 10)
     def GetTRange(self):
         return self.__T_RANGE
 
-    def _SetTLabel(self):
+    def __SetTLabel(self):
         self.__T_Label = np.round(self.__T_RANGE / (self.__SAMPLING_RATE * self.__US_VELOCITY_DOUBLE), 1)
     def GetTLabel(self):
         return self.__T_Label
@@ -99,22 +95,28 @@ class DDD_File:
             self.path = self._getctime() + ".ddd"
 
         self.SetHeader(header)
-        self.data = data
+        self.SetData(data)
 
     def SetHeader(self, header = None):
         if isinstance(header, DDD_Header):
-            self.header = header
+            self.__header = header
         elif header == None:
             pass
         else:
             raise TypeError("Type Must Be Class of DDD_HEADER")
     def GetHeader(self):
-        return self.header
+        return self.__header
+
+    def IsHeader(self):
+        if self.GetHeader() != None:
+            return True
+        else:
+            return False
 
     def SetData(self, data):
-        self.data = data
+        self.__data = data
     def GetData(self):
-        return self.data
+        return self.__data
 
     def Save(self, path = None):
         if path == None:
@@ -127,13 +129,12 @@ class DDD_File:
         if self.GetHeader() == None:
             raise NoneHeaderException
 
-        with open(self.path, "wb") as f:
-            # print(self.header.GetVelocityDouble(), type(self.header.GetVelocityDouble()))
-            pixel_size = round(self.header.GetLevel() / 256)
-            if len(self.data) == self.header.GetWidth() * self.header.GetHeight() * self.header.GetDepth() * pixel_size:
-                f.write(struct.pack('5i', self.header.GetWidth(), self.header.GetHeight(), self.header.GetDepth(), self.header.GetLevel(), self.header.GetSamplingRate()))
-                f.write(struct.pack('d', self.header.GetVelocityDouble()))
-                f.write(bytearray(self.data))
+        pixel_size = round(self.__header.GetLevel() / 256)
+        if len(self.__data) == (self.__header.GetWidth() * self.__header.GetHeight() * self.__header.GetDepth() * pixel_size):
+            with open(self.path, "wb") as f:
+                f.write(struct.pack('5i', self.__header.GetWidth(), self.__header.GetHeight(), self.__header.GetDepth(), self.__header.GetLevel(), self.__header.GetSamplingRate()))
+                f.write(struct.pack('d', self.__header.GetVelocityDouble()))
+                f.write(bytearray(self.__data))
 
     def Load(self, path = None):
         if path == None:
@@ -153,11 +154,8 @@ class DDD_File:
                 sr = struct.unpack("i", headlist[4])[0]
                 v = struct.unpack("d", headlist[5])[0]
 
-                self.header = DDD_Header(WIDTH=w, HEGHIT=h, DEPTH=d, LEVEL=l, SAMPLING_RATE=sr, US_VALOCITY=v)
-                self.data = bytearray(f.read())
-
-            print(w, h, d, l, sr, v)
-            # print(data)
+                self.SetHeader(DDD_Header(WIDTH=w, HEGHIT=h, DEPTH=d, LEVEL=l, SAMPLING_RATE=sr, US_VALOCITY=v))
+                self.SetData(bytearray(f.read()))
 
     def _getctime(self):
         date = datetime.now()
