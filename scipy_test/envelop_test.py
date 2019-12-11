@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import hilbert, chirp, hilbert2
 
-from DAO.DDD import DDD_File
+from VO.DDD import DDD_File
 from scipy_test.module import FilteredSignal
 
 
@@ -35,7 +35,7 @@ def envelope(data, bias = 0, axis=-1):
 
 def proc_test_data():
 
-    from DAO.DDD import DDD_File
+    from VO.DDD import DDD_File
 
     ddd1 = DDD_File(path="./data/20191204original.ddd")
     ddd1.Load()
@@ -70,6 +70,7 @@ def example():
     print(null_signal.shape)
 
     samples = int(fs*duration)
+
     t = np.arange(samples) / fs
     t2 = np.arange(samples*2) / fs
 
@@ -88,7 +89,7 @@ def example():
     amplitude_envelope3 = np.abs(analytic_signal3)
 
     t4 = np.arange(samples * 2) / fs
-    sigseg = list(np.arange(samples / 2) / fs)
+    sigseg = list(np.arange(samples / 2) / (fs/2))
     sigseg.extend(sigseg)
     sigseg.extend(sigseg)
     signal4 = sigseg
@@ -97,13 +98,12 @@ def example():
 
 
     signal5 = get_data()
-    t5 = np.arange(len(signal5)) - 0.5
+    t5 = np.arange(len(signal5))/255
 
     filteredSignal = FilteredSignal(signal5, fs, cutoff=30)
 
     analytic_signal5 = hilbert(signal5, N=None)
     amplitude_envelope5 = np.abs(analytic_signal5)
-
 
 
     # instantaneous_phase = np.unwrap(np.angle(analytic_signal))

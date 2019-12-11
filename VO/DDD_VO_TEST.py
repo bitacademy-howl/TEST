@@ -1,6 +1,6 @@
 import numpy as np
 
-from DAO.VO_win_python_3 import DDD_File, DDD_Header
+from VO.VO_win_python_3 import DDD_File, DDD_Header
 
 if __name__ == "__main__":
 

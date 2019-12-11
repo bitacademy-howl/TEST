@@ -1,6 +1,6 @@
 from datetime import datetime as dt
 
-from DAO.VO_win_python_3 import DDD_File, DDD_Header
+from VO.VO_win_python_3 import DDD_File, DDD_Header
 from un0rick_test.process import Process
 
 bytearray()
@@ -48,4 +48,4 @@ def testMain3(self):
     end = dt.now()
     delta = end - start
 
-    print("Total Process takes time {0} ".format(str(delta)))
+    print("Total Processor takes time {0} ".format(str(delta)))

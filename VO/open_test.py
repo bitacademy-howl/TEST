@@ -1,4 +1,4 @@
-from DAO.DDD import DDD_File
+from VO.DDD import DDD_File
 
 ddd1 = DDD_File(path="./data/1.ddd")
 ddd1.Load()
