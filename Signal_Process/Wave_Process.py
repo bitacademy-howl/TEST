@@ -50,6 +50,9 @@ class Processor:
     @classmethod
     def fft(cls, signal: ndarray) -> list:
         # fft = np.fft.fft(signal, n=(len(signal)*5))/len(signal)
+        NFFT = len(signal)
+        k = np.arange(NFFT)
+        f0 = k * fs / NFFT
         fft = np.fft.fft(signal) / len(signal)
         fft_magnitude = abs(fft)
         fft_spectrum = np.fft.fftshift(fft_magnitude)
